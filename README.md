@@ -41,9 +41,9 @@ To use these graphical helpers, you will need:
    ```
 
 3. Print the documents from the following folders:
-   - [chords]
-   - [scales]
-   - [progressions]
+   - [Chords](chords)
+   - [Scales](scales)
+   - [Progressions](progressions)
 
 4. Fold or cut out the guides and place them behind your piano keys according to the provided instructions.
 
@@ -64,4 +64,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you find this project helpful and would like to support its development, consider buying me a coffee!
 
-[![Buy Me A Coffee](images/buymeacoffee.webp)](https://www.buymeacoffee.com/blebleblee)
+[![Buy Me A Coffee](images/bmce.svg)](https://www.buymeacoffee.com/blebleblee)
