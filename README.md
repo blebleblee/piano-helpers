@@ -63,5 +63,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support and Donations
 
 If you find this project helpful and would like to support its development, consider buying me a coffee!
-
 [![Buy Me A Coffee](images/buymeacoffee.webp)](https://www.buymeacoffee.com/blebleblee)
