@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piano Learning Helpers — Enhanced Edition & Interactive Builder</title>
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --border: #E2E8F0;
+      --border-strong: #94A3B8;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --accent: #DC2626;
+      --accent-hover: #B91C1C;
+      --accent-soft: #FEE2E2;
+      --amber: #D97706;
+      --emerald: #059669;
+      --blue: #2563EB;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header Bar */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+    .badge-tag {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Navigation Tabs */
+    nav { display: flex; gap: 0.4rem; }
+    .nav-btn {
+      background: none;
+      border: 1px solid transparent;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover { color: var(--text); background: var(--bg); }
+    .nav-btn.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: rgba(220, 38, 38, 0.2);
+    }
+
+    /* Main Container */
+    main { max-width: 1200px; margin: 1.5rem auto; padding: 0 1.5rem; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Download Banner */
+    .download-banner {
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      color: #fff;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+    }
+    .banner-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.2rem; }
+    .banner-desc { font-size: 0.8rem; color: #94A3B8; }
+    .btn-zip {
+      background: var(--accent);
+      color: #fff;
+      padding: 0.55rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-zip:hover { background: var(--accent-hover); }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .pill-group { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .pill.active { background: var(--text); color: #fff; border-color: var(--text); }
+    .search-input {
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      min-width: 240px;
+    }
+
+    /* Cards Grid */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .card-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+    .card-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+    .card-category { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .card-hand { font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 4px; }
+    .card-hand.rh { background: #E0E7FF; color: #4338CA; }
+    .card-hand.lh { background: #FEF3C7; color: #B45309; }
+    .card-hand.both { background: #DCFCE7; color: #15803D; }
+    .card-title { font-size: 1rem; font-weight: 800; margin-bottom: 0.2rem; }
+    .card-formula { font-size: 0.75rem; color: var(--text-muted); font-family: ui-monospace, monospace; margin-bottom: 1rem; }
+    .card-actions { display: flex; gap: 0.5rem; }
+    .btn {
+      flex: 1;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+    .btn-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg); }
+
+    /* Builder View */
+    .builder-layout {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .builder-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem; text-transform: uppercase; }
+    .form-control {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: #fff;
+    }
+    .preview-canvas {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: auto;
+    }
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--emerald);
+      background: #DCFCE7;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Guide Content */
+    .guide-article {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .guide-article h2 { font-size: 1.4rem; font-weight: 800; margin: 1.5rem 0 0.75rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    .guide-article h2:first-of-type { margin-top: 0; }
+    .guide-article h3 { font-size: 1.1rem; font-weight: 700; margin: 1.25rem 0 0.5rem 0; }
+    .guide-article p { margin-bottom: 0.85rem; color: #334155; }
+    .guide-article ul, .guide-article ol { margin: 0 0 1rem 1.5rem; color: #334155; }
+    .guide-article li { margin-bottom: 0.35rem; }
+    .diagram-box {
+      background: var(--bg);
+      border: 1px dashed var(--border-strong);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+      margin: 1rem 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    /* Print Styles */
+    @media print {
+      header, .download-banner, .filter-bar, .builder-panel, nav { display: none !important; }
+      body, main { margin: 0; padding: 0; background: #fff; }
+      .preview-canvas { border: none; padding: 0; width: 100%; height: 100%; }
+      .preview-canvas svg { width: 100vw !important; height: auto !important; max-width: none !important; }
+      @page { size: A4 landscape; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Piano Learning Helpers</h1>
+      <span class="badge-tag">Unified Matrix Edition</span>
+    </div>
+    <nav>
+      <button class="nav-btn active" onclick="switchTab('catalog')">Card Catalog (61)</button>
+      <button class="nav-btn" onclick="switchTab('builder')">Live Custom Builder</button>
+      <button class="nav-btn" onclick="switchTab('guide')">User Guide &amp; Theory</button>
+      <a href="https://www.buymeacoffee.com/blebleblee" target="_blank" class="nav-btn" style="color: #D97706; background: #FEF3C7; text-decoration: none; border-color: rgba(217, 119, 6, 0.2);">☕ Buy Me a Coffee</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- TAB 1: CARD CATALOG -->
+    <section id="tab-catalog" class="tab-content active">
+      <!-- ZIP Download Banner -->
+      <div class="download-banner">
+        <div>
+          <div class="banner-title">📦 Download Complete Collection (All 61 Cards)</div>
+          <div class="banner-desc">Includes all 42 Chords, 13 Scales/Modes, 6 Progressions, GUIDE.md, and README in one ZIP archive.</div>
+        </div>
+        <a href="piano-helpers-complete.zip" download class="btn-zip">⬇️ Download Complete ZIP (9.8 MB)</a>
+      </div>
+
+      <div class="filter-bar">
+        <div class="pill-group" id="category-pills">
+          <button class="pill active" onclick="filterCatalog('all')">All (61)</button>
+          <button class="pill" onclick="filterCatalog('triads')">Triads (12)</button>
+          <button class="pill" onclick="filterCatalog('sevenths')">7th Chords (16)</button>
+          <button class="pill" onclick="filterCatalog('extended')">Extended &amp; 9ths (14)</button>
+          <button class="pill" onclick="filterCatalog('scales')">Scales &amp; Modes (13)</button>
+          <button class="pill" onclick="filterCatalog('progressions')">Progressions (6)</button>
+        </div>
+        <input type="text" id="catalog-search" class="search-input" placeholder="Search cards (e.g. maj7, dorian, blues)..." oninput="searchCatalog()">
+      </div>
+      <div class="catalog-grid" id="catalog-container"></div>
+    </section>
+
+    <!-- TAB 2: LIVE CUSTOM BUILDER -->
+    <section id="tab-builder" class="tab-content">
+      <div class="builder-layout">
+        <div class="builder-panel">
+          <h2 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 1rem;">Live Card Generator</h2>
+          
+          <div class="form-group">
+            <label for="builder-type">Category</label>
+            <select id="builder-type" class="form-control" onchange="updateBuilderType()">
+              <option value="chord">Chord (Triad / 7th / 9th)</option>
+              <option value="scale">Scale / Mode</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="group-chord-preset">
+            <label for="builder-chord-preset">Chord Type</label>
+            <select id="builder-chord-preset" class="form-control" onchange="generateLiveSvg()">
+              <optgroup label="Triads">
+                <option value="maj">Major Triad [4+3]</option>
+                <option value="min">Minor Triad [3+4]</option>
+                <option value="dim">Diminished Triad [3+3]</option>
+                <option value="aug">Augmented Triad [4+4]</option>
+                <option value="sus2">Suspended 2nd [2+5]</option>
+                <option value="sus4">Suspended 4th [5+2]</option>
+              </optgroup>
+              <optgroup label="7th Chords">
+                <option value="dom7">Dominant 7th [4+3+3]</option>
+                <option value="maj7">Major 7th [4+3+4]</option>
+                <option value="min7">Minor 7th [3+4+3]</option>
+                <option value="dim7">Diminished 7th [3+3+3]</option>
+                <option value="m7b5">Half-Diminished (m7♭5) [3+3+4]</option>
+                <option value="mM7">Minor-Major 7th [3+4+4]</option>
+                <option value="maj6">Major 6th [4+3+2]</option>
+                <option value="min6">Minor 6th [3+4+2]</option>
+              </optgroup>
+              <optgroup label="Extended & 9th Chords">
+                <option value="add9">Major (add9) [4+3+7]</option>
+                <option value="7sus4">Suspended 7th [5+2+3]</option>
+                <option value="dom9">Dominant 9th [4+3+3+4]</option>
+                <option value="maj9">Major 9th [4+3+4+3]</option>
+                <option value="min9">Minor 9th [3+4+3+4]</option>
+                <option value="7b9">Altered 7♭9 [4+3+3+3]</option>
+                <option value="7s9">Altered 7♯9 (Hendrix) [4+3+3+5]</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group" id="group-scale-preset" style="display: none;">
+            <label for="builder-scale-preset">Scale / Mode</label>
+            <select id="builder-scale-preset" class="form-control" onchange="generateLiveSvg()">
+              <optgroup label="Diatonic Scales">
+                <option value="major">Major Scale (Ionian)</option>
+                <option value="minor">Natural Minor (Aeolian)</option>
+                <option value="harmonic_minor">Harmonic Minor</option>
+                <option value="melodic_minor">Melodic Minor (Asc)</option>
+              </optgroup>
+              <optgroup label="Church Modes">
+                <option value="dorian">Dorian Mode</option>
+                <option value="phrygian">Phrygian Mode</option>
+                <option value="lydian">Lydian Mode</option>
+                <option value="mixolydian">Mixolydian Mode</option>
+                <option value="locrian">Locrian Mode</option>
+              </optgroup>
+              <optgroup label="Pentatonic & Blues">
+                <option value="major_penta">Major Pentatonic</option>
+                <option value="minor_penta">Minor Pentatonic</option>
+                <option value="major_blues">Major Blues</option>
+                <option value="minor_blues">Minor Blues (Hexatonic)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="builder-hand">Hand</label>
+            <select id="builder-hand" class="form-control" onchange="generateLiveSvg()">
+              <option value="RH">Right Hand (RH)</option>
+              <option value="LH">Left Hand (LH)</option>
+            </select>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Direct Print (A4 Landscape)</button>
+            <button class="btn btn-secondary" onclick="downloadLiveSvg()">⬇️ Export Vector SVG</button>
+          </div>
+        </div>
+
+        <div class="preview-canvas" id="preview-container">
+          <div class="status-badge">⚡ Live 1:1 Vector Render (Client-Side)</div>
+          <div id="svg-mount-point" style="width: 100%; display: flex; justify-content: center;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: USAGE GUIDE & THEORY -->
+    <section id="tab-guide" class="tab-content">
+      <article class="guide-article">
+        <h2>How to Use Piano Learning Helpers</h2>
+        <p>These printable reference cards sit directly on your piano fallboard behind the physical keys to visually guide your fingers.</p>
+
+        <div class="diagram-box">
+       ┌────────────────────────────────────────────────────────┐
+       │             PIANO LEARNING HELPER CARD                 │
+       │                                                        │
+       │  [Table of Chords / Notes]                             │
+       │  [Inversion Fingerings: 1 - 3 - 5]                     │
+       │  [Drawn Piano Keys: C  C#  D  D#  E  F  F#  G ...]     │
+───────┴────────────────────▼ ROOT ▼────────────────────────────┴─────── [90° Fold]
+       ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+       │   │ █ │   │ █ │   │   │ █ │   │ █ │   │ █ │   │   │ █ │   │  [Real Piano Keys]
+       │ C │C# │ D │D# │ E │ F │F# │ G │G# │ A │A# │ B │ C │C# │ D │
+       └───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘</div>
+
+        <h3>1. The 3-Second Sliding Transposition</h3>
+        <p>Because every chord of the same type shares identical semitone intervals, <strong>Column 0 is always your Root Note</strong>:</p>
+        <ol>
+          <li>Find the Root Note you want to play (e.g. <strong>D</strong> or <strong>E♭</strong>).</li>
+          <li>Slide the card until the red <strong><code>▼ ROOT ▼</code></strong> arrow points directly to that key on your piano.</li>
+          <li>Look across that chord's row (e.g. <code>D maj</code> or <code>Eb maj</code>) to see the exact notes and key types.</li>
+          <li>Play the finger numbers shown in the inversion rows right above the keys!</li>
+        </ol>
+
+        <h3>2. What Do the Dots Mean? (Key Shapes: ○ White vs. ● Black)</h3>
+        <p>Pianists memorize chords by their tactile physical shape under the fingers:</p>
+        <ul>
+          <li><strong><code>○</code> = White Key</strong> (flat, wide key surface)</li>
+          <li><strong><code>●</code> = Black Key</strong> (raised, narrow key surface)</li>
+        </ul>
+        <p>Examples:</p>
+        <ul>
+          <li><code>C maj [○ ○ ○]</code>: All three fingers rest on flat <strong>white keys</strong>.</li>
+          <li><code>D maj [○ ● ○]</code>: Outer fingers on <strong>white keys</strong>, middle finger reaches up to a raised <strong>black key</strong> (F#).</li>
+          <li><code>Eb maj [● ○ ●]</code>: Outer fingers on raised <strong>black keys</strong>, middle finger drops down to a <strong>white key</strong> (G).</li>
+        </ul>
+
+        <h3>3. Full Guide Available</h3>
+        <p>For the complete manual covering voice leading, church modes, and troubleshooting, read <a href="GUIDE.md" style="color: var(--accent); font-weight: 700;">GUIDE.md</a>.</p>
+
+        <div style="margin-top: 2rem; padding: 1.25rem; background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 8px; text-align: center;">
+          <h4 style="font-size: 1rem; font-weight: 800; color: #92400E; margin-bottom: 0.35rem;">Support Piano Learning Helpers</h4>
+          <p style="font-size: 0.85rem; color: #B45309; margin-bottom: 0.75rem;">If you find these cards helpful for your piano practice, consider buying me a coffee to support continued development!</p>
+          <a href="https://www.buymeacoffee.com/blebleblee" target="_blank" style="display: inline-block;">
+            <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="38" width="162">
+          </a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    // Complete 61-Card Catalog Data
+    const CARDS = [
+      // Triads (12)
+      { id: "chords_maj_RH", title: "Major Triad", cat: "triads", hand: "RH", formula: "1 — 3 — 5 [4+3]", file: "chords/chords_maj_RH.pdf" },
+      { id: "chords_maj_LH", title: "Major Triad", cat: "triads", hand: "LH", formula: "1 — 3 — 5 [4+3]", file: "chords/chords_maj_LH.pdf" },
+      { id: "chords_min_RH", title: "Minor Triad", cat: "triads", hand: "RH", formula: "1 — ♭3 — 5 [3+4]", file: "chords/chords_min_RH.pdf" },
+      { id: "chords_min_LH", title: "Minor Triad", cat: "triads", hand: "LH", formula: "1 — ♭3 — 5 [3+4]", file: "chords/chords_min_LH.pdf" },
+      { id: "chords_dim_RH", title: "Diminished Triad", cat: "triads", hand: "RH", formula: "1 — ♭3 — ♭5 [3+3]", file: "chords/chords_dim_RH.pdf" },
+      { id: "chords_dim_LH", title: "Diminished Triad", cat: "triads", hand: "LH", formula: "1 — ♭3 — ♭5 [3+3]", file: "chords/chords_dim_LH.pdf" },
+      { id: "chords_aug_RH", title: "Augmented Triad", cat: "triads", hand: "RH", formula: "1 — 3 — ♯5 [4+4]", file: "chords/chords_aug_RH.pdf" },
+      { id: "chords_aug_LH", title: "Augmented Triad", cat: "triads", hand: "LH", formula: "1 — 3 — ♯5 [4+4]", file: "chords/chords_aug_LH.pdf" },
+      { id: "chords_sus2_RH", title: "Suspended 2nd", cat: "triads", hand: "RH", formula: "1 — 2 — 5 [2+5]", file: "chords/chords_sus2_RH.pdf" },
+      { id: "chords_sus2_LH", title: "Suspended 2nd", cat: "triads", hand: "LH", formula: "1 — 2 — 5 [2+5]", file: "chords/chords_sus2_LH.pdf" },
+      { id: "chords_sus4_RH", title: "Suspended 4th", cat: "triads", hand: "RH", formula: "1 — 4 — 5 [5+2]", file: "chords/chords_sus4_RH.pdf" },
+      { id: "chords_sus4_LH", title: "Suspended 4th", cat: "triads", hand: "LH", formula: "1 — 4 — 5 [5+2]", file: "chords/chords_sus4_LH.pdf" },
+
+      // 7th Chords (16)
+      { id: "chords_dom7_RH", title: "Dominant 7th", cat: "sevenths", hand: "RH", formula: "1 — 3 — 5 — ♭7 [4+3+3]", file: "chords/chords_dom7_RH.pdf" },
+      { id: "chords_dom7_LH", title: "Dominant 7th", cat: "sevenths", hand: "LH", formula: "1 — 3 — 5 — ♭7 [4+3+3]", file: "chords/chords_dom7_LH.pdf" },
+      { id: "chords_maj7_RH", title: "Major 7th", cat: "sevenths", hand: "RH", formula: "1 — 3 — 5 — 7 [4+3+4]", file: "chords/chords_maj7_RH.pdf" },
+      { id: "chords_maj7_LH", title: "Major 7th", cat: "sevenths", hand: "LH", formula: "1 — 3 — 5 — 7 [4+3+4]", file: "chords/chords_maj7_LH.pdf" },
+      { id: "chords_min7_RH", title: "Minor 7th", cat: "sevenths", hand: "RH", formula: "1 — ♭3 — 5 — ♭7 [3+4+3]", file: "chords/chords_min7_RH.pdf" },
+      { id: "chords_min7_LH", title: "Minor 7th", cat: "sevenths", hand: "LH", formula: "1 — ♭3 — 5 — ♭7 [3+4+3]", file: "chords/chords_min7_LH.pdf" },
+      { id: "chords_dim7_RH", title: "Diminished 7th", cat: "sevenths", hand: "RH", formula: "1 — ♭3 — ♭5 — 𝄫7 [3+3+3]", file: "chords/chords_dim7_RH.pdf" },
+      { id: "chords_dim7_LH", title: "Diminished 7th", cat: "sevenths", hand: "LH", formula: "1 — ♭3 — ♭5 — 𝄫7 [3+3+3]", file: "chords/chords_dim7_LH.pdf" },
+      { id: "chords_m7b5_RH", title: "Half-Diminished (m7♭5)", cat: "sevenths", hand: "RH", formula: "1 — ♭3 — ♭5 — ♭7 [3+3+4]", file: "chords/chords_m7b5_RH.pdf" },
+      { id: "chords_m7b5_LH", title: "Half-Diminished (m7♭5)", cat: "sevenths", hand: "LH", formula: "1 — ♭3 — ♭5 — ♭7 [3+3+4]", file: "chords/chords_m7b5_LH.pdf" },
+      { id: "chords_mM7_RH", title: "Minor-Major 7th", cat: "sevenths", hand: "RH", formula: "1 — ♭3 — 5 — 7 [3+4+4]", file: "chords/chords_mM7_RH.pdf" },
+      { id: "chords_mM7_LH", title: "Minor-Major 7th", cat: "sevenths", hand: "LH", formula: "1 — ♭3 — 5 — 7 [3+4+4]", file: "chords/chords_mM7_LH.pdf" },
+      { id: "chords_maj6_RH", title: "Major 6th", cat: "sevenths", hand: "RH", formula: "1 — 3 — 5 — 6 [4+3+2]", file: "chords/chords_maj6_RH.pdf" },
+      { id: "chords_maj6_LH", title: "Major 6th", cat: "sevenths", hand: "LH", formula: "1 — 3 — 5 — 6 [4+3+2]", file: "chords/chords_maj6_LH.pdf" },
+      { id: "chords_min6_RH", title: "Minor 6th", cat: "sevenths", hand: "RH", formula: "1 — ♭3 — 5 — 6 [3+4+2]", file: "chords/chords_min6_RH.pdf" },
+      { id: "chords_min6_LH", title: "Minor 6th", cat: "sevenths", hand: "LH", formula: "1 — ♭3 — 5 — 6 [3+4+2]", file: "chords/chords_min6_LH.pdf" },
+
+      // Extended & 9ths (14)
+      { id: "chords_add9_RH", title: "Major (add9)", cat: "extended", hand: "RH", formula: "1 — 3 — 5 — 9 [4+3+7]", file: "chords/chords_add9_RH.pdf" },
+      { id: "chords_add9_LH", title: "Major (add9)", cat: "extended", hand: "LH", formula: "1 — 3 — 5 — 9 [4+3+7]", file: "chords/chords_add9_LH.pdf" },
+      { id: "chords_7sus4_RH", title: "Suspended 7th (7sus4)", cat: "extended", hand: "RH", formula: "1 — 4 — 5 — ♭7 [5+2+3]", file: "chords/chords_7sus4_RH.pdf" },
+      { id: "chords_7sus4_LH", title: "Suspended 7th (7sus4)", cat: "extended", hand: "LH", formula: "1 — 4 — 5 — ♭7 [5+2+3]", file: "chords/chords_7sus4_LH.pdf" },
+      { id: "chords_dom9_RH", title: "Dominant 9th", cat: "extended", hand: "RH", formula: "1 — 3 — 5 — ♭7 — 9", file: "chords/chords_dom9_RH.pdf" },
+      { id: "chords_dom9_LH", title: "Dominant 9th", cat: "extended", hand: "LH", formula: "1 — 3 — 5 — ♭7 — 9", file: "chords/chords_dom9_LH.pdf" },
+      { id: "chords_maj9_RH", title: "Major 9th", cat: "extended", hand: "RH", formula: "1 — 3 — 5 — 7 — 9", file: "chords/chords_maj9_RH.pdf" },
+      { id: "chords_maj9_LH", title: "Major 9th", cat: "extended", hand: "LH", formula: "1 — 3 — 5 — 7 — 9", file: "chords/chords_maj9_LH.pdf" },
+      { id: "chords_min9_RH", title: "Minor 9th", cat: "extended", hand: "RH", formula: "1 — ♭3 — 5 — ♭7 — 9", file: "chords/chords_min9_RH.pdf" },
+      { id: "chords_min9_LH", title: "Minor 9th", cat: "extended", hand: "LH", formula: "1 — ♭3 — 5 — ♭7 — 9", file: "chords/chords_min9_LH.pdf" },
+      { id: "chords_7b9_RH", title: "Altered 7♭9", cat: "extended", hand: "RH", formula: "1 — 3 — 5 — ♭7 — ♭9", file: "chords/chords_7b9_RH.pdf" },
+      { id: "chords_7b9_LH", title: "Altered 7♭9", cat: "extended", hand: "LH", formula: "1 — 3 — 5 — ♭7 — ♭9", file: "chords/chords_7b9_LH.pdf" },
+      { id: "chords_7s9_RH", title: "Altered 7♯9 (Hendrix)", cat: "extended", hand: "RH", formula: "1 — 3 — 5 — ♭7 — ♯9", file: "chords/chords_7s9_RH.pdf" },
+      { id: "chords_7s9_LH", title: "Altered 7♯9 (Hendrix)", cat: "extended", hand: "LH", formula: "1 — 3 — 5 — ♭7 — ♯9", file: "chords/chords_7s9_LH.pdf" },
+
+      // Scales & Modes (13)
+      { id: "scales_major", title: "Major Scale (Ionian)", cat: "scales", hand: "BOTH", formula: "W—W—H—W—W—W—H", file: "scales/scales_major.pdf" },
+      { id: "scales_minor", title: "Natural Minor (Aeolian)", cat: "scales", hand: "BOTH", formula: "W—H—W—W—H—W—W", file: "scales/scales_minor.pdf" },
+      { id: "scales_harmonic_minor", title: "Harmonic Minor", cat: "scales", hand: "BOTH", formula: "W—H—W—W—H—A2—H", file: "scales/scales_harmonic_minor.pdf" },
+      { id: "scales_melodic_minor", title: "Melodic Minor (Asc)", cat: "scales", hand: "BOTH", formula: "W—H—W—W—W—W—H", file: "scales/scales_melodic_minor.pdf" },
+      { id: "scales_major_penta", title: "Major Pentatonic", cat: "scales", hand: "BOTH", formula: "1 — 2 — 3 — 5 — 6", file: "scales/scales_major_penta.pdf" },
+      { id: "scales_minor_penta", title: "Minor Pentatonic", cat: "scales", hand: "BOTH", formula: "1 — ♭3 — 4 — 5 — ♭7", file: "scales/scales_minor_penta.pdf" },
+      { id: "scales_major_blues", title: "Major Blues", cat: "scales", hand: "BOTH", formula: "1 — 2 — ♭3 — 3 — 5 — 6", file: "scales/scales_major_blues.pdf" },
+      { id: "scales_minor_blues", title: "Minor Blues (Hexatonic)", cat: "scales", hand: "BOTH", formula: "1 — ♭3 — 4 — ♭5 — 5 — ♭7", file: "scales/scales_minor_blues.pdf" },
+      { id: "scales_dorian", title: "Dorian Mode", cat: "scales", hand: "BOTH", formula: "1 — 2 — ♭3 — 4 — 5 — 6 — ♭7", file: "scales/scales_dorian.pdf" },
+      { id: "scales_mixolydian", title: "Mixolydian Mode", cat: "scales", hand: "BOTH", formula: "1 — 2 — 3 — 4 — 5 — 6 — ♭7", file: "scales/scales_mixolydian.pdf" },
+      { id: "scales_lydian", title: "Lydian Mode", cat: "scales", hand: "BOTH", formula: "1 — 2 — 3 — ♯4 — 5 — 6 — 7", file: "scales/scales_lydian.pdf" },
+      { id: "scales_phrygian", title: "Phrygian Mode", cat: "scales", hand: "BOTH", formula: "1 — ♭2 — ♭3 — 4 — 5 — ♭6 — ♭7", file: "scales/scales_phrygian.pdf" },
+      { id: "scales_locrian", title: "Locrian Mode", cat: "scales", hand: "BOTH", formula: "1 — ♭2 — ♭3 — 4 — ♭5 — ♭6 — ♭7", file: "scales/scales_locrian.pdf" },
+
+      // Progressions (6)
+      { id: "progressions_pop", title: "Pop & Rock Standards", cat: "progressions", hand: "BOTH", formula: "I—V—vi—IV & vi—IV—I—V", file: "progressions/progressions_pop.pdf" },
+      { id: "progressions_jazz", title: "Jazz Cadence & Turnaround", cat: "progressions", hand: "BOTH", formula: "ii—V—I & I—vi—ii—V", file: "progressions/progressions_jazz.pdf" },
+      { id: "progressions_classic", title: "Pachelbel & 3-Chord Blues", cat: "progressions", hand: "BOTH", formula: "I—V—vi—iii—IV & I—IV—V", file: "progressions/progressions_classic.pdf" },
+      { id: "progressions_blues_12bar", title: "Complete 12-Bar Blues", cat: "progressions", hand: "BOTH", formula: "I7 — IV7 — V7 with Turnaround", file: "progressions/progressions_blues_12bar.pdf" },
+      { id: "progressions_circle_of_fifths", title: "Circle of Fifths Progression", cat: "progressions", hand: "BOTH", formula: "ii7—V7—Imaj7—IVmaj7—vi7", file: "progressions/progressions_circle_of_fifths.pdf" },
+      { id: "progressions_jazz_rootless", title: "Two-Hand Rootless Jazz Voicings", cat: "progressions", hand: "BOTH", formula: "Bill Evans A & B Voicings for ii-V-I", file: "progressions/progressions_jazz_rootless.pdf" }
+    ];
+
+    // Client-Side Music Theory Model
+    const ROOT_KEYS = [
+      ["C", 0], ["Db", 1], ["D", 2], ["Eb", 3], ["E", 4], ["F", 5],
+      ["Gb", 6], ["G", 7], ["Ab", 8], ["A", 9], ["Bb", 10], ["B", 11]
+    ];
+    const BLACK_SEMITONES = [false, true, false, true, false, false, true, false, true, false, true, false];
+    const NOTE_NAMES_FROM_C = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F"];
+
+    const SPELLINGS = {
+      "C":  ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F"],
+      "Db": ["Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb"],
+      "D":  ["D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D", "Eb", "E", "F", "F#", "G"],
+      "Eb": ["Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"],
+      "E":  ["E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A"],
+      "F":  ["F", "F#", "G", "Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb"],
+      "Gb": ["Gb", "G", "Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"],
+      "G":  ["G", "G#", "A", "Bb", "B", "C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B", "C"],
+      "Ab": ["Ab", "A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", "C", "Db"],
+      "A":  ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D"],
+      "Bb": ["Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", "C", "Db", "D", "Eb"],
+      "B":  ["B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"]
+    };
+
+    const CHORDS_DEF = {
+      "maj":   { title: "MAJOR CHORDS", suffix: "maj", semitones: [0, 4, 7, 12, 16], formula: "[4 + 3]", degs: ["Root", "3rd", "5th", "Octave", "Oct 3rd"] },
+      "min":   { title: "MINOR CHORDS", suffix: "min", semitones: [0, 3, 7, 12, 15], formula: "[3 + 4]", degs: ["Root", "♭3rd", "5th", "Octave", "Oct ♭3"] },
+      "dim":   { title: "DIMINISHED CHORDS", suffix: "dim", semitones: [0, 3, 6, 12, 15], formula: "[3 + 3]", degs: ["Root", "♭3rd", "♭5th", "Octave", "Oct ♭3"] },
+      "aug":   { title: "AUGMENTED CHORDS", suffix: "aug", semitones: [0, 4, 8, 12, 16], formula: "[4 + 4]", degs: ["Root", "3rd", "♯5th", "Octave", "Oct 3rd"] },
+      "sus2":  { title: "SUSPENDED 2nd CHORDS", suffix: "sus2", semitones: [0, 2, 7, 12, 14], formula: "[2 + 5]", degs: ["Root", "2nd", "5th", "Octave", "Oct 2nd"] },
+      "sus4":  { title: "SUSPENDED 4th CHORDS", suffix: "sus4", semitones: [0, 5, 7, 12, 17], formula: "[5 + 2]", degs: ["Root", "4th", "5th", "Octave", "Oct 4th"] },
+      "dom7":  { title: "DOMINANT 7th CHORDS", suffix: "7", semitones: [0, 4, 7, 10, 12, 16], formula: "[4 + 3 + 3]", degs: ["Root", "3rd", "5th", "♭7th", "Octave", "Oct 3rd"] },
+      "maj7":  { title: "MAJOR 7th CHORDS", suffix: "maj7", semitones: [0, 4, 7, 11, 12, 16], formula: "[4 + 3 + 4]", degs: ["Root", "3rd", "5th", "7th", "Octave", "Oct 3rd"] },
+      "min7":  { title: "MINOR 7th CHORDS", suffix: "min7", semitones: [0, 3, 7, 10, 12, 15], formula: "[3 + 4 + 3]", degs: ["Root", "♭3rd", "5th", "♭7th", "Octave", "Oct ♭3"] },
+      "dim7":  { title: "DIMINISHED 7th CHORDS", suffix: "dim7", semitones: [0, 3, 6, 9, 12, 15], formula: "[3 + 3 + 3]", degs: ["Root", "♭3rd", "♭5th", "𝄫7th", "Octave", "Oct ♭3"] },
+      "m7b5":  { title: "HALF-DIMINISHED (m7♭5)", suffix: "m7b5", semitones: [0, 3, 6, 10, 12, 15], formula: "[3 + 3 + 4]", degs: ["Root", "♭3rd", "♭5th", "♭7th", "Octave", "Oct ♭3"] },
+      "mM7":   { title: "MINOR-MAJOR 7th CHORDS", suffix: "mM7", semitones: [0, 3, 7, 11, 12, 15], formula: "[3 + 4 + 4]", degs: ["Root", "♭3rd", "5th", "7th", "Octave", "Oct ♭3"] },
+      "maj6":  { title: "MAJOR 6th CHORDS", suffix: "6", semitones: [0, 4, 7, 9, 12, 16], formula: "[4 + 3 + 2]", degs: ["Root", "3rd", "5th", "6th", "Octave", "Oct 3rd"] },
+      "min6":  { title: "MINOR 6th CHORDS", suffix: "min6", semitones: [0, 3, 7, 9, 12, 15], formula: "[3 + 4 + 2]", degs: ["Root", "♭3rd", "5th", "6th", "Octave", "Oct ♭3"] },
+      "add9":  { title: "MAJOR (add9) CHORDS", suffix: "add9", semitones: [0, 4, 7, 12, 14, 16], formula: "[4 + 3 + 7]", degs: ["Root", "3rd", "5th", "Octave", "9th", "Oct 3rd"] },
+      "7sus4": { title: "SUSPENDED 7th CHORDS", suffix: "7sus4", semitones: [0, 5, 7, 10, 12, 17], formula: "[5 + 2 + 3]", degs: ["Root", "4th", "5th", "♭7th", "Octave", "Oct 4th"] },
+      "dom9":  { title: "DOMINANT 9th CHORDS", suffix: "9", semitones: [0, 4, 7, 10, 14, 16], formula: "[4 + 3 + 3 + 4]", degs: ["Root", "3rd", "5th", "♭7th", "9th", "Oct 3rd"] },
+      "maj9":  { title: "MAJOR 9th CHORDS", suffix: "maj9", semitones: [0, 4, 7, 11, 14, 16], formula: "[4 + 3 + 4 + 3]", degs: ["Root", "3rd", "5th", "7th", "9th", "Oct 3rd"] },
+      "min9":  { title: "MINOR 9th CHORDS", suffix: "min9", semitones: [0, 3, 7, 10, 14, 15], formula: "[3 + 4 + 3 + 4]", degs: ["Root", "♭3rd", "5th", "♭7th", "9th", "Oct ♭3"] },
+      "7b9":   { title: "ALTERED 7♭9 CHORDS", suffix: "7b9", semitones: [0, 4, 7, 10, 13, 16], formula: "[4 + 3 + 3 + 3]", degs: ["Root", "3rd", "5th", "♭7th", "♭9th", "Oct 3rd"] },
+      "7s9":   { title: "ALTERED 7♯9 (HENDRIX)", suffix: "7#9", semitones: [0, 4, 7, 10, 15, 16], formula: "[4 + 3 + 3 + 5]", degs: ["Root", "3rd", "5th", "♭7th", "♯9th", "Oct 3rd"] }
+    };
+
+    const SCALES_DEF = {
+      "major":          { title: "MAJOR SCALE (IONIAN)", semitones: [0, 2, 4, 5, 7, 9, 11, 12], formula: "W—W—H—W—W—W—H", degs: ["1", "2", "3", "4", "5", "6", "7", "8ve"] },
+      "minor":          { title: "NATURAL MINOR SCALE", semitones: [0, 2, 3, 5, 7, 8, 10, 12], formula: "W—H—W—W—H—W—W", degs: ["1", "2", "♭3", "4", "5", "♭6", "♭7", "8ve"] },
+      "harmonic_minor": { title: "HARMONIC MINOR SCALE", semitones: [0, 2, 3, 5, 7, 8, 11, 12], formula: "W—H—W—W—H—A2—H", degs: ["1", "2", "♭3", "4", "5", "♭6", "7", "8ve"] },
+      "melodic_minor":  { title: "MELODIC MINOR SCALE", semitones: [0, 2, 3, 5, 7, 9, 11, 12], formula: "W—H—W—W—W—W—H", degs: ["1", "2", "♭3", "4", "5", "6", "7", "8ve"] },
+      "dorian":         { title: "DORIAN MODE", semitones: [0, 2, 3, 5, 7, 9, 10, 12], formula: "1—2—♭3—4—5—6—♭7", degs: ["1", "2", "♭3", "4", "5", "6", "♭7", "8ve"] },
+      "phrygian":       { title: "PHRYGIAN MODE", semitones: [0, 1, 3, 5, 7, 8, 10, 12], formula: "1—♭2—♭3—4—5—♭6—♭7", degs: ["1", "♭2", "♭3", "4", "5", "♭6", "♭7", "8ve"] },
+      "lydian":         { title: "LYDIAN MODE", semitones: [0, 2, 4, 6, 7, 9, 11, 12], formula: "1—2—3—♯4—5—6—7", degs: ["1", "2", "3", "♯4", "5", "6", "7", "8ve"] },
+      "mixolydian":     { title: "MIXOLYDIAN MODE", semitones: [0, 2, 4, 5, 7, 9, 10, 12], formula: "1—2—3—4—5—6—♭7", degs: ["1", "2", "3", "4", "5", "6", "♭7", "8ve"] },
+      "locrian":        { title: "LOCRIAN MODE", semitones: [0, 1, 3, 5, 6, 8, 10, 12], formula: "1—♭2—♭3—4—♭5—♭6—♭7", degs: ["1", "♭2", "♭3", "4", "♭5", "♭6", "♭7", "8ve"] },
+      "major_penta":    { title: "MAJOR PENTATONIC", semitones: [0, 2, 4, 7, 9, 12], formula: "1—2—3—5—6", degs: ["1", "2", "3", "5", "6", "8ve"] },
+      "minor_penta":    { title: "MINOR PENTATONIC", semitones: [0, 3, 5, 7, 10, 12], formula: "1—♭3—4—5—♭7", degs: ["1", "♭3", "4", "5", "♭7", "8ve"] },
+      "major_blues":    { title: "MAJOR BLUES SCALE", semitones: [0, 2, 3, 4, 7, 9, 12], formula: "1—2—♭3—3—5—6", degs: ["1", "2", "♭3", "3", "5", "6", "8ve"] },
+      "minor_blues":    { title: "MINOR BLUES (HEXATONIC)", semitones: [0, 3, 5, 6, 7, 10, 12], formula: "1—♭3—4—♭5—5—♭7", degs: ["1", "♭3", "4", "♭5", "5", "♭7", "8ve"] }
+    };
+
+    let currentCategory = 'all';
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      
+      const targetBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (targetBtn) targetBtn.classList.add('active');
+      
+      const targetSection = document.getElementById(`tab-${tabId}`);
+      if (targetSection) targetSection.classList.add('active');
+
+      if (tabId === 'builder') {
+        generateLiveSvg();
+      }
+    }
+
+    function renderCatalog() {
+      const container = document.getElementById('catalog-container');
+      const query = (document.getElementById('catalog-search').value || '').toLowerCase();
+      
+      const filtered = CARDS.filter(c => {
+        const matchesCat = (currentCategory === 'all' || c.cat === currentCategory);
+        const matchesQuery = c.title.toLowerCase().includes(query) || c.formula.toLowerCase().includes(query) || c.id.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      container.innerHTML = filtered.map(c => `
+        <div class="card-item">
+          <div>
+            <div class="card-meta">
+              <span class="card-category">${c.cat}</span>
+              <span class="card-hand ${c.hand.toLowerCase()}">${c.hand}</span>
+            </div>
+            <h3 class="card-title">${c.title}</h3>
+            <div class="card-formula">${c.formula}</div>
+          </div>
+          <div class="card-actions">
+            <a href="${c.file}" target="_blank" class="btn btn-secondary">👁️ View PDF</a>
+            <a href="${c.file}" download class="btn btn-primary">⬇️ Download PDF</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCatalog(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('#category-pills .pill').forEach(p => p.classList.remove('active'));
+      const activePill = Array.from(document.querySelectorAll('#category-pills .pill')).find(p => p.getAttribute('onclick').includes(cat));
+      if (activePill) activePill.classList.add('active');
+      renderCatalog();
+    }
+
+    function searchCatalog() {
+      renderCatalog();
+    }
+
+    function updateBuilderType() {
+      const type = document.getElementById('builder-type').value;
+      document.getElementById('group-chord-preset').style.display = (type === 'chord') ? 'block' : 'none';
+      document.getElementById('group-scale-preset').style.display = (type === 'scale') ? 'block' : 'none';
+      generateLiveSvg();
+    }
+
+    function getDegreeColor(deg) {
+      if (deg.includes("Root") || deg === "1") return "#DC2626";
+      if (deg.includes("3") || deg.includes("2") || deg.includes("4")) return "#D97706";
+      if (deg.includes("5") || deg.includes("6")) return "#059669";
+      return "#2563EB";
+    }
+
+    // Full Client-Side Vector Unified Matrix Generator
+    function generateLiveSvg() {
+      const mount = document.getElementById('svg-mount-point');
+      const type = document.getElementById('builder-type').value;
+      const presetKey = (type === 'chord') ? document.getElementById('builder-chord-preset').value : document.getElementById('builder-scale-preset').value;
+      const hand = document.getElementById('builder-hand').value;
+
+      const def = (type === 'chord') ? CHORDS_DEF[presetKey] : SCALES_DEF[presetKey];
+      if (!def) return;
+
+      const COL_W = 39.08;
+      const LABEL_COL_W = 72.0;
+      const NUM_COLS = 18;
+      const TOTAL_TABLE_W = LABEL_COL_W + NUM_COLS * COL_W; // 775.44
+      const LEFT_M = (841.89 - TOTAL_TABLE_W) / 2.0; // 33.22
+
+      let svg = [];
+      svg.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 842 595" width="100%" style="max-width: 820px; border: 1px solid var(--border); border-radius: 8px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">`);
+      svg.push(`<defs><style>.fs { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; }</style></defs>`);
+      svg.push(`<rect width="842" height="595" fill="#fff"/>`);
+
+      // Header
+      const titleStr = def.title;
+      const subtitleStr = `Formula: ${def.formula} • Calibrated Key Pitch: 13.79mm per column`;
+      svg.push(`
+        <g transform="translate(${LEFT_M}, 16)">
+          <text class="fs" x="0" y="20" font-size="18" fill="#0F172A">${titleStr}</text>
+          <rect x="280" y="5" width="80" height="19" rx="9.5" fill="#FEE2E2"/>
+          <text class="fs" x="320" y="18" font-size="8" fill="#DC2626" text-anchor="middle">${hand} HAND</text>
+          <text x="0" y="38" font-size="9" fill="#334155" font-family="-apple-system, sans-serif">${subtitleStr}</text>
+        </g>
+      `);
+
+      // Legend Card on Right
+      svg.push(`
+        <g transform="translate(${LEFT_M + TOTAL_TABLE_W - 345}, 12)">
+          <rect width="345" height="44" rx="5" fill="#F8FAFC" stroke="#E2E8F0"/>
+          <text class="fs" x="12" y="12" font-size="6.5" fill="#64748B">KEY TYPES</text>
+          <text class="fs" x="12" y="24" font-size="7.5" fill="#0F172A">○ = White Key    ● = Black Key</text>
+          <text x="12" y="34" font-size="6" fill="#64748B" font-family="-apple-system, sans-serif">(e.g. D is ○●○ = White • Black • White)</text>
+          
+          <line x1="142" y1="6" x2="142" y2="38" stroke="#E2E8F0"/>
+          <text class="fs" x="152" y="12" font-size="6.5" fill="#64748B">TONE COLORS</text>
+          <circle cx="158" cy="22" r="3" fill="#DC2626"/><text class="fs" x="165" y="24.5" font-size="6.5" fill="#0F172A">Root</text>
+          <circle cx="158" cy="33" r="3" fill="#D97706"/><text class="fs" x="165" y="35.5" font-size="6.5" fill="#0F172A">3rd/2nd</text>
+          <circle cx="204" cy="22" r="3" fill="#059669"/><text class="fs" x="211" y="24.5" font-size="6.5" fill="#0F172A">5th</text>
+          <circle cx="204" cy="33" r="3" fill="#2563EB"/><text class="fs" x="211" y="35.5" font-size="6.5" fill="#0F172A">7th/6th</text>
+
+          <line x1="250" y1="6" x2="250" y2="38" stroke="#E2E8F0"/>
+          <text class="fs" x="296" y="12" font-size="6.5" fill="#64748B" text-anchor="middle">${hand} FINGERS</text>
+          <text x="296" y="28" font-size="7.5" fill="#0F172A" text-anchor="middle" font-family="-apple-system, sans-serif" font-weight="700">1 • 2 • 3 • 4 • 5</text>
+          <text x="296" y="38" font-size="5.5" fill="#64748B" text-anchor="middle" font-family="-apple-system, sans-serif">Thumb to Pinky</text>
+        </g>
+      `);
+
+      // Column Header
+      const gridTop = 68.0;
+      svg.push(`
+        <g transform="translate(${LEFT_M}, ${gridTop})">
+          <rect x="0" y="0" width="${LABEL_COL_W}" height="24" fill="#F8FAFC" stroke="#E2E8F0"/>
+          <text class="fs" x="${LABEL_COL_W/2}" y="11" font-size="7.5" fill="#0F172A" text-anchor="middle">${type.toUpperCase()}</text>
+          <text x="${LABEL_COL_W/2}" y="20" font-size="6" fill="#64748B" text-anchor="middle" font-family="-apple-system, sans-serif">Key Shape</text>
+      `);
+      for (let c = 0; c < NUM_COLS; c++) {
+        const isTone = def.semitones.includes(c);
+        const degName = isTone ? def.degs[def.semitones.indexOf(c)] : `+${c}`;
+        const isBlack = BLACK_SEMITONES[c % 12];
+        svg.push(`
+          <rect x="${LABEL_COL_W + c * COL_W}" y="0" width="${COL_W}" height="24" fill="${isBlack ? '#F1F5F9' : '#F8FAFC'}" stroke="#E2E8F0"/>
+          <text class="fs" x="${LABEL_COL_W + c * COL_W + COL_W/2}" y="10" font-size="7.5" fill="${isTone ? '#0F172A' : '#94A3B8'}" text-anchor="middle">+${c}</text>
+          <text class="fs" x="${LABEL_COL_W + c * COL_W + COL_W/2}" y="19.5" font-size="6.5" fill="${isTone ? '#DC2626' : '#94A3B8'}" text-anchor="middle">${degName}</text>
+        `);
+      }
+      svg.push(`</g>`);
+
+      // 12 Chromatic Rows
+      const rowH = 16.5;
+      ROOT_KEYS.forEach(([rootName, rootSt], rIdx) => {
+        const ry = gridTop + 24 + rIdx * rowH;
+        const isEven = (rIdx % 2 === 0);
+        const label = `${rootName} ${def.suffix || ''}`;
+
+        // Tactile dots
+        const checkTones = def.semitones.slice(0, 3);
+        const dots = checkTones.map(st => BLACK_SEMITONES[(rootSt + st) % 12] ? "●" : "○").join("");
+
+        svg.push(`
+          <g transform="translate(${LEFT_M}, ${ry})">
+            <rect x="0" y="0" width="${LABEL_COL_W}" height="${rowH}" fill="${isEven ? '#fff' : '#F8FAFC'}" stroke="#E2E8F0"/>
+            <text class="fs" x="5" y="11.5" font-size="7.5" fill="#0F172A">${label}</text>
+            <text class="fs" x="${LABEL_COL_W - 4}" y="11.5" font-size="6" fill="#334155" text-anchor="end" letter-spacing="0.4">${dots}</text>
+        `);
+
+        for (let c = 0; c < NUM_COLS; c++) {
+          const isBlackCol = BLACK_SEMITONES[c % 12];
+          const cellBg = isBlackCol ? (isEven ? '#F1F5F9' : '#E2E8F0') : (isEven ? '#fff' : '#F8FAFC');
+          svg.push(`<rect x="${LABEL_COL_W + c * COL_W}" y="0" width="${COL_W}" height="${rowH}" fill="${cellBg}" stroke="#E2E8F0"/>`);
+
+          if (def.semitones.includes(c)) {
+            const toneIdx = def.semitones.indexOf(c);
+            const degName = def.degs[toneIdx];
+            const noteName = (SPELLINGS[rootName] && SPELLINGS[rootName][c]) ? SPELLINGS[rootName][c] : rootName;
+            const isBlackNote = BLACK_SEMITONES[(rootSt + c) % 12];
+            const accent = getDegreeColor(degName);
+
+            const bx = LABEL_COL_W + c * COL_W + 3;
+            const bw = COL_W - 6;
+            const bh = rowH - 3;
+            const by = 1.5;
+
+            if (isBlackNote) {
+              svg.push(`
+                <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3.5" fill="#1E293B" stroke="${accent}" stroke-width="1.2"/>
+                <text class="fs" x="${bx + bw/2 - 4}" y="${by + 9}" font-size="8.5" fill="#FFFFFF" text-anchor="middle">${noteName}</text>
+                <text class="fs" x="${bx + bw - 4}" y="${by + 8}" font-size="5" fill="${accent}">●</text>
+              `);
+            } else {
+              svg.push(`
+                <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3.5" fill="#FFFFFF" stroke="${accent}" stroke-width="1.2"/>
+                <text class="fs" x="${bx + bw/2 - 4}" y="${by + 9}" font-size="8.5" fill="${accent}" text-anchor="middle">${noteName}</text>
+                <text class="fs" x="${bx + bw - 4}" y="${by + 8}" font-size="5" fill="${accent}">○</text>
+              `);
+            }
+          }
+        }
+        svg.push(`</g>`);
+      });
+
+      // Inversion / Fingering Rows
+      const tableBottom = gridTop + 24 + 12 * rowH;
+      const invH = 18.0;
+      const inversions = (type === 'chord') ? [
+        ["ROOT", "1 • 3 • 5", "#DC2626", {0: "1", 4: "3", 7: "5"}],
+        ["1ST INV", "1 • 2 • 5", "#D97706", {4: "1", 7: "2", 12: "5"}],
+        ["2ND INV", "1 • 3 • 5", "#059669", {7: "1", 12: "3", 16: "5"}]
+      ] : [
+        ["RH FINGERS", "1 - 2 - 3 - 1 - 2", "#DC2626", {0: "1", 2: "2", 4: "3", 5: "1", 7: "2"}],
+        ["LH FINGERS", "5 - 4 - 3 - 2 - 1", "#2563EB", {0: "5", 2: "4", 4: "3", 5: "2", 7: "1"}]
+      ];
+
+      svg.push(`<g transform="translate(${LEFT_M}, ${tableBottom})">`);
+      inversions.forEach(([name, desc, colColor, map], iIdx) => {
+        const iy = iIdx * invH;
+        svg.push(`
+          <rect x="0" y="${iy}" width="${LABEL_COL_W}" height="${invH}" fill="${colColor}" stroke="#E2E8F0"/>
+          <text class="fs" x="${LABEL_COL_W/2}" y="${iy + 8.5}" font-size="6.5" fill="#fff" text-anchor="middle">${name}</text>
+          <text x="${LABEL_COL_W/2}" y="${iy + 15}" font-size="5" fill="#fff" text-anchor="middle" font-family="-apple-system, sans-serif" font-weight="600">${desc}</text>
+        `);
+        for (let c = 0; c < NUM_COLS; c++) {
+          const cx = LABEL_COL_W + c * COL_W;
+          const isBlack = BLACK_SEMITONES[c % 12];
+          const bg = isBlack ? '#F1F5F9' : '#F8FAFC';
+          if (map[c]) {
+            svg.push(`
+              <rect x="${cx + 1}" y="${iy + 1}" width="${COL_W - 2}" height="${invH - 2}" rx="2" fill="${colColor}"/>
+              <text class="fs" x="${cx + COL_W/2}" y="${iy + invH - 5.5}" font-size="9" fill="#fff" text-anchor="middle">${map[c]}</text>
+            `);
+          } else {
+            svg.push(`<rect x="${cx}" y="${iy}" width="${COL_W}" height="${invH}" fill="${bg}" stroke="#E2E8F0"/>`);
+          }
+        }
+      });
+      svg.push(`</g>`);
+
+      // Piano Key Bed at Bottom
+      const kbTop = tableBottom + inversions.length * invH;
+      const kbH = 44.0;
+      svg.push(`
+        <g transform="translate(${LEFT_M}, ${kbTop})">
+          <rect x="0" y="0" width="${LABEL_COL_W}" height="${kbH}" fill="#F8FAFC" stroke="#94A3B8"/>
+          <text class="fs" x="${LABEL_COL_W/2}" y="18" font-size="7.5" fill="#0F172A" text-anchor="middle">PIANO KEYS</text>
+          <text class="fs" x="${LABEL_COL_W/2}" y="28" font-size="6" fill="#DC2626" text-anchor="middle">ALIGNMENT</text>
+          <text x="${LABEL_COL_W/2}" y="37" font-size="5" fill="#64748B" text-anchor="middle" font-family="-apple-system, sans-serif">Touch fallboard</text>
+      `);
+
+      for (let c = 0; c < NUM_COLS; c++) {
+        const cx = LABEL_COL_W + c * COL_W;
+        const isBlack = BLACK_SEMITONES[c % 12];
+        const note = NOTE_NAMES_FROM_C[c];
+        const isActive = def.semitones.includes(c);
+
+        if (!isBlack) {
+          svg.push(`
+            <rect x="${cx + 0.5}" y="0" width="${COL_W - 1}" height="${kbH}" rx="2" fill="#fff" stroke="#94A3B8" stroke-width="1.2"/>
+            <text class="fs" x="${cx + COL_W/2}" y="${kbH - 8}" font-size="7" fill="${isActive ? '#DC2626' : '#94A3B8'}" text-anchor="middle">${note}</text>
+          `);
+        } else {
+          svg.push(`<rect x="${cx + 0.5}" y="0" width="${COL_W - 1}" height="${kbH}" rx="2" fill="#F1F5F9" stroke="#E2E8F0"/>`);
+        }
+      }
+
+      // Black keys
+      for (let c = 0; c < NUM_COLS; c++) {
+        if (BLACK_SEMITONES[c % 12]) {
+          const bw = COL_W * 0.74;
+          const cx = LABEL_COL_W + c * COL_W + (COL_W - bw) / 2.0;
+          svg.push(`
+            <rect x="${cx}" y="0" width="${bw}" height="${kbH * 0.62}" rx="2" fill="#1E293B" stroke="#0F172A"/>
+            <text class="fs" x="${LABEL_COL_W + c * COL_W + COL_W/2}" y="${kbH * 0.62 - 6}" font-size="6" fill="#fff" text-anchor="middle">${NOTE_NAMES_FROM_C[c]}</text>
+          `);
+        }
+      }
+      svg.push(`</g>`);
+
+      // Octave Divider Line
+      const octaveX = LEFT_M + LABEL_COL_W + 12 * COL_W;
+      svg.push(`<line x1="${octaveX}" y1="${gridTop}" x2="${octaveX}" y2="${kbTop + kbH}" stroke="#475569" stroke-width="1.8"/>`);
+
+      // Root Pointer Arrow
+      const rootX = LEFT_M + LABEL_COL_W + COL_W / 2.0;
+      svg.push(`
+        <g transform="translate(${rootX}, ${kbTop + kbH})">
+          <polygon points="-5,0 5,0 0,6" fill="#DC2626"/>
+          <rect x="-18" y="7" width="36" height="12" rx="2" fill="#DC2626"/>
+          <text class="fs" x="0" y="15.5" font-size="6" fill="#fff" text-anchor="middle">ROOT</text>
+        </g>
+      `);
+
+      // Base Stand Fold Line
+      const foldY = kbTop + kbH + 3.0;
+      svg.push(`
+        <g transform="translate(0, ${foldY})">
+          <line x1="${LEFT_M}" y1="0" x2="${rootX - 22}" y2="0" stroke="#DC2626" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="${rootX + 22}" y1="0" x2="${LEFT_M + TOTAL_TABLE_W}" y2="0" stroke="#DC2626" stroke-width="1" stroke-dasharray="4,3"/>
+          <text class="fs" x="421" y="11" font-size="7" fill="#DC2626" letter-spacing="1.2" text-anchor="middle">▼ FOLD FORWARD 90° HERE — KEYS REST DIRECTLY BEHIND PIANO KEYS ▼</text>
+        </g>
+      `);
+
+      svg.push(`</svg>`);
+      mount.innerHTML = svg.join('');
+    }
+
+    function downloadLiveSvg() {
+      const svg = document.querySelector('#svg-mount-point svg');
+      if (!svg) return;
+      const type = document.getElementById('builder-type').value;
+      const preset = (type === 'chord') ? document.getElementById('builder-chord-preset').value : document.getElementById('builder-scale-preset').value;
+      const hand = document.getElementById('builder-hand').value;
+
+      const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `piano_helper_${preset}_${hand}.svg`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialize catalog and live builder on load
+    renderCatalog();
+    generateLiveSvg();
+  </script>
+</body>
+</html>
